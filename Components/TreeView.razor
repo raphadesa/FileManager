@@ -1,0 +1,171 @@
+﻿<ul class="no-bullet pl-2">
+    @if (Directories != null)
+    {
+        foreach (var dir in Directories.Where(c=>c.isDeleted==false))
+        {
+            /* Folder management */
+            <li>
+                <span class="pointer" @onclick="dir.toggle"><img src="@dir.getIcon()" /></span>                
+                    
+                        @if (dir.isRename)
+                        {
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" @bind="@dir.renameDir" />
+                                </div>
+                                <button class="btn btn-blue" @onclick="@(() => onRenameDirectory.InvokeAsync(dir))">OK</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <ContextMenuTrigger MenuId="@dir.ID.ToString()" CssClass="d-inline">
+                                <button class="btn btn-link d-inline p-0" @onclick="@(() => onSelectDirectory.InvokeAsync(dir))">
+                                    <DropTarget T="String" Drop="@OnDropDir" DataDest="@dir.fullName">
+                                        <Draggable Data="@dir.fullName">
+                                            @dir.name
+                                        </Draggable>                                          
+                                   </DropTarget>
+                                </button>
+                            </ContextMenuTrigger>
+                            @if (dir.showMenu)
+                            {
+                            <ContextMenu Id="@dir.ID.ToString()">                                
+                                <Item OnClick="@(() => createDir(dir))"><img src="/img/FileManager/folder_add.png" />&nbsp;Create a directory</Item>
+                                <Item OnClick="@(() => onUploadFile.InvokeAsync(dir))"><img src="/img/FileManager/folder_add.png" />&nbsp;Upload a file</Item>
+                                @if (!dir.isRootNode)
+                                {
+                                    <Item OnClick="@(() => renameDir(dir))"><img src="/img/FileManager/folder_edit.png" />&nbsp;Rename directory</Item>
+                                }
+                                @if (!dir.isRootNode)
+                                {
+                                    <Item OnClick="@(() => onDeleteDirectory.InvokeAsync(dir))"><img src="/img/FileManager/folder_remove.png" />&nbsp;Delete directory</Item>
+                                }                                
+                            </ContextMenu>                            
+                                }
+                            }
+                    
+
+
+                @if (dir.isCreate)
+                {
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <input type="text" class="form-control" @bind="@dir.createDir" />
+                        </div>
+                        <button class="btn btn-blue" @onclick="@(() => onCreateDirectory.InvokeAsync(dir))">OK</button>
+                    </div>
+                }
+
+
+
+                @if (dir.expanded)
+                {
+                    <ul class="no-bullet pl-4">
+                        @foreach (var file in dir.files.Where(c=>c.isDeleted==false))
+                        {
+                            /* File management */                            
+                            <li>
+                                @if (file.isRename)
+                                        {
+                                            <div class="form-inline">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" @bind="@file.renameFile" />
+                                                </div>
+                                                <button class="btn btn-blue" @onclick="@(() => onRenameFile.InvokeAsync(file))">OK</button>
+                                            </div>
+
+                                        }
+                                        else
+                                        {
+                                            <ContextMenuTrigger MenuId="@file.ID.ToString()" CssClass="d-inline">
+                                                <button class="btn btn-link d-inline p-0" @onclick="@(() => onSelectFile.InvokeAsync(file))">
+                                                    <Draggable Data="@file.fullName">
+                                                        <img src="@file.Icon" />@file.name
+                                                    </Draggable>
+                                                </button>
+                                            </ContextMenuTrigger>
+                                            @if (file.showMenu)
+                                            {
+                                            <ContextMenu Id="@file.ID.ToString()">
+                                                    <Item OnClick="@(() => createDir(dir))"><img src="/img/FileManager/folder_add.png" />&nbsp;Create a directory</Item>
+                                                    <Item OnClick="@(() => onUploadFile.InvokeAsync(dir))"><img src="/img/FileManager/folder_add.png" />&nbsp;Upload a file</Item>
+                                                    <Item><a class="download-link" @onclick="@(() => onDownloadFile.InvokeAsync(file))"><img src="/img/FileManager/file_download.png" />&nbsp;Download file</a></Item>
+                                                    <Item OnClick="@(() => renameFile(file))"><img src="/img/FileManager/folder_edit.png" />&nbsp;Rename file</Item>
+                                                    <Item OnClick="@(() => onDeleteFile.InvokeAsync(file))"><img src="/img/FileManager/folder_remove.png" />&nbsp;Delete file</Item>                                                
+                                             </ContextMenu>                                            
+                                            }
+
+                                        }
+
+                            </li>                                
+
+                            }
+                        <TreeView Directories="dir.directories"
+                                  onSelectFile="onSelectFile"
+                                  onDeleteFile="onDeleteFile"                              
+                                  onRenameFile="onRenameFile"
+                                  onUploadFile="onUploadFile"
+                                  onDownloadFile="onDownloadFile"
+                                  onDragAndDropFile="onDragAndDropFile"
+                                  onSelectDirectory="onSelectDirectory"
+                                  onDeleteDirectory="onDeleteDirectory"
+                                  onRenameDirectory="onRenameDirectory"
+                                  onCreateDirectory="onCreateDirectory"
+                                  onDragAndDropDirectory="onDragAndDropDirectory">
+                        </TreeView>
+                    </ul>
+                }
+            </li>
+        }
+    }
+</ul>
+
+@code
+ {
+    [Parameter] public List<DirectoryVM> Directories { get; set; }
+    [Parameter] public EventCallback<FileVM> onSelectFile { get; set; }
+    [Parameter] public EventCallback<FileVM> onDeleteFile { get; set; }    
+    [Parameter] public EventCallback<FileVM> onRenameFile { get; set; }
+    [Parameter] public EventCallback<DirectoryVM> onUploadFile { get; set; }
+    [Parameter] public EventCallback<FileVM> onDownloadFile { get; set; }
+    [Parameter] public EventCallback<FilesVM> onDragAndDropFile { get; set; }
+    [Parameter] public EventCallback<DirectoryVM> onSelectDirectory { get; set; }
+    [Parameter] public EventCallback<DirectoryVM> onDeleteDirectory { get; set; }
+    [Parameter] public EventCallback<DirectoryVM> onRenameDirectory { get; set; }
+    [Parameter] public EventCallback<DirectoryVM> onCreateDirectory { get; set; }
+    [Parameter] public EventCallback<DirectoriesVM> onDragAndDropDirectory { get; set; }    
+
+    void renameDir(DirectoryVM dir)
+    {
+        dir.isRename = !dir.isRename;
+        dir.renameDir = dir.name;
+    }
+
+    void createDir(DirectoryVM dir)
+    {
+        dir.isCreate = true;
+    }
+
+    void renameFile(FileVM file)
+    {
+        file.isRename = !file.isRename;
+        file.renameFile = file.name;
+    }
+
+    void OnDropDir(string origDir, string destDir)
+    {
+        var vm = new DirectoriesVM { origDir = origDir, destDir = destDir };
+
+        onDragAndDropDirectory.InvokeAsync(vm);
+    }
+
+    void OnDropFile(string origFile, string destFile)
+    {
+        var vm = new FilesVM { origFile = origFile, destFile = destFile };
+
+        onDragAndDropFile.InvokeAsync(vm);
+    }
+
+
+}
+

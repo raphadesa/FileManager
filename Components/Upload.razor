@@ -1,0 +1,91 @@
+﻿@using System.IO;
+@inject IFileReaderService fileReaderService;
+
+<div class="title text-center mt-n5 mb-4">Upload your files</div>
+
+<div class="box text-center">
+    <input @ref="@inputTypeFileElement" type="file" @onchange="@ReadFile" id="file-1" class="inputfile inputfile-1" multiple />
+    @if (!uploadStarted)
+    {
+        <label for="file-1"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" /></svg> <span>Select one or more files&hellip;</span></label>
+    }
+</div>
+
+@if (uploadStarted)
+{
+    <button class="btn btn-blue" disabled>
+        <span class="spinner-border spinner-border-sm"></span>
+        Upload in progress...
+    </button>
+}
+
+@if (uploadStarted)
+{
+    @if (progress < 100)
+    {
+        <div id="progress" class="progress mt-5">
+            <div class="progress-bar bg-blue" role="progressbar" style="width: @(progress)%;" aria-valuenow="@progress" aria-valuemin="0" aria-valuemax="100">@progress%</div>
+        </div>
+    }
+}
+
+
+@code {
+    [Parameter] public string filePath { get; set; }
+    [Parameter] public EventCallback<List<string>> onUploadFinished { get; set; }
+    ElementReference inputTypeFileElement;
+    long lastAnnounce = 0;
+    List<string> filesList = new List<string>();
+    int BufferSize { get; set; } = 20480;
+    int? progress;
+    bool uploadStarted { get; set; }
+    async Task ReadFile()
+    {
+        uploadStarted = true;
+        StateHasChanged();
+        long totalCountSize = 0;
+        int countSize = 0;
+        lastAnnounce = 0;
+
+        foreach (var file in await fileReaderService.CreateReference(inputTypeFileElement).EnumerateFilesAsync())
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+            totalCountSize += fileInfo.Size;
+        }
+
+        var chunkSize = Configuration.buffferMax;
+
+        foreach (var file in await fileReaderService.CreateReference(inputTypeFileElement).EnumerateFilesAsync())
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+            var fileName = Path.Combine(filePath, fileInfo.Name);
+            filesList.Add(fileName);
+
+            using (var fs = await file.OpenReadAsync())
+            {
+                var buffer = new byte[chunkSize];
+                int count;
+                while ((count = await fs.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                {
+                    using (var fsWrite = new FileStream(fileName, (count == 0 ? FileMode.Create : FileMode.Append)))
+                    {
+                        await fsWrite.WriteAsync(buffer, 0, count);
+                        countSize += count;
+                        progress = (int)(((decimal)countSize / totalCountSize) * 100);
+                        if (progress > (lastAnnounce + 10))
+                        {
+                            this.StateHasChanged();
+                            lastAnnounce = progress.Value;
+                        }
+                    }
+                }
+            }
+
+        }
+        progress = null;      
+        await onUploadFinished.InvokeAsync(filesList);
+    }
+
+
+
+}

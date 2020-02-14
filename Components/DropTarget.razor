@@ -1,0 +1,26 @@
+﻿@inject DragAndDropHelper DragAndDropHelper
+@typeparam T
+<div ondragover="event.preventDefault()" @ondrop="OnDrop" class="d-inline">
+    @ChildContent
+</div>
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Zone { get; set; }
+
+    [Parameter]
+    public  Action<T,T> Drop { get; set; }
+
+    [Parameter]
+    public T DataDest { get; set; }
+
+    void OnDrop()
+    {
+        if (Drop != null && DragAndDropHelper.Accepts(Zone))
+        {
+            Drop((T)DragAndDropHelper.Data, DataDest);
+        }
+    }
+}
