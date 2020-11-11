@@ -1,0 +1,5 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="_content/Blazor.ContextMenu" Path="C:\Users\rapha\.nuget\packages\blazor.contextmenu\1.8.0\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazored.Toast" Path="C:\Users\rapha\.nuget\packages\blazored.toast\3.1.2\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/BlazorStrap" Path="C:\Users\rapha\.nuget\packages\blazorstrap\1.3.3\build\..\staticwebassets\" />
+</StaticWebAssets>

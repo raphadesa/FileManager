@@ -10,25 +10,23 @@
         "projectUniqueName": "D:\\Projets\\Blazor\\FileManager\\FileManager.csproj",
         "projectName": "FileManager",
         "projectPath": "D:\\Projets\\Blazor\\FileManager\\FileManager.csproj",
-        "packagesPath": "C:\\Users\\rdesalbres.DIRMESSAGES\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\rapha\\.nuget\\packages\\",
         "outputPath": "D:\\Projets\\Blazor\\FileManager\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\rdesalbres.DIRMESSAGES\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\rapha\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "netcoreapp3.1"
+          "net5.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "netcoreapp3.1": {
+          "net5.0": {
+            "targetAlias": "net5.0",
             "projectReferences": {}
           }
         },
@@ -39,23 +37,20 @@
         }
       },
       "frameworks": {
-        "netcoreapp3.1": {
+        "net5.0": {
+          "targetAlias": "net5.0",
           "dependencies": {
             "Blazor.ContextMenu": {
               "target": "Package",
-              "version": "[1.6.0, )"
-            },
-            "Tewr.Blazor.FileReader": {
-              "target": "Package",
-              "version": "[1.3.0.20041, )"
+              "version": "[1.8.0, )"
             },
             "blazored.toast": {
               "target": "Package",
-              "version": "[2.0.8, )"
+              "version": "[3.1.2, )"
             },
             "blazorstrap": {
               "target": "Package",
-              "version": "[1.1.101, )"
+              "version": "[1.3.3, )"
             }
           },
           "imports": [
@@ -76,7 +71,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

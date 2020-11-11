@@ -13,7 +13,7 @@ using FileManager.Data;
 using Blazored.Toast;
 using FileManager.Services;
 using FileManager.Helpers.DragAndDrop;
-using Blazor.FileReader;
+using BlazorStrap;
 
 namespace FileManager
 {
@@ -30,19 +30,15 @@ namespace FileManager
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {            
-            services.AddRazorPages();            
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddBootstrapCss();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<DragAndDropHelper>();
             services.AddScoped<FileManagerService>();
-            services.AddOptions();
+            services.AddOptions();            
             IConfigurationSection sec = Configuration.GetSection("Setting");
-            services.Configure<Helpers.Configuration>(sec);
-            //Components
-            services.AddServerSideBlazor().AddHubOptions(o =>
-            {
-                o.MaximumReceiveMessageSize = Helpers.Configuration.buffferMaxConfig;
-            });
-            services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
+            services.Configure<Helpers.Configuration>(sec);            
             services.AddBlazorContextMenu();            
             services.AddBlazoredToast();
             services.AddMemoryCache();
